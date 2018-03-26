@@ -1,8 +1,2 @@
-cache
-cache/*
-sami/*
-sami.*
-vendor
-vendor/*
-composer.lock
-index.php
+renderer.index
+*_VERSION
