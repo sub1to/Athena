@@ -12,7 +12,9 @@ namespace CharlotteDunois\Athena;
 /**
  * The Athena Cache client. Uses Redis as cache asynchronously.
  */
-class AthenaCache extends \CharlotteDunois\Events\EventEmitter implements CacheInterface {
+class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, CacheInterface {
+    use \CharlotteDunois\Events\EventEmitterTrait;
+    
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
     
