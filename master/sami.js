@@ -36,13 +36,6 @@ window.projectVersion = 'master';
                     {"type": "Method", "fromName": "CharlotteDunois\\Athena\\AthenaCache", "fromLink": "CharlotteDunois/Athena/AthenaCache.html", "link": "CharlotteDunois/Athena/AthenaCache.html#method_set", "name": "CharlotteDunois\\Athena\\AthenaCache::set", "doc": "&quot;Sets an item in the cache. The promise gets always rejected on errors.&quot;"},
                     {"type": "Method", "fromName": "CharlotteDunois\\Athena\\AthenaCache", "fromLink": "CharlotteDunois/Athena/AthenaCache.html", "link": "CharlotteDunois/Athena/AthenaCache.html#method_delete", "name": "CharlotteDunois\\Athena\\AthenaCache::delete", "doc": "&quot;Deletes an item in the cache. The promise gets always rejected on errors.&quot;"},
             
-            {"type": "Class", "fromName": "CharlotteDunois\\Athena", "fromLink": "CharlotteDunois/Athena.html", "link": "CharlotteDunois/Athena/CacheInterface.html", "name": "CharlotteDunois\\Athena\\CacheInterface", "doc": "&quot;The asynchronous cache interface.&quot;"},
-                                                        {"type": "Method", "fromName": "CharlotteDunois\\Athena\\CacheInterface", "fromLink": "CharlotteDunois/Athena/CacheInterface.html", "link": "CharlotteDunois/Athena/CacheInterface.html#method_get", "name": "CharlotteDunois\\Athena\\CacheInterface::get", "doc": "&quot;Gets an item from the cache. The promise gets always rejected on errors.&quot;"},
-                    {"type": "Method", "fromName": "CharlotteDunois\\Athena\\CacheInterface", "fromLink": "CharlotteDunois/Athena/CacheInterface.html", "link": "CharlotteDunois/Athena/CacheInterface.html#method_getAll", "name": "CharlotteDunois\\Athena\\CacheInterface::getAll", "doc": "&quot;Gets multiple items from the cache. The promise gets always rejected on errors.&quot;"},
-                    {"type": "Method", "fromName": "CharlotteDunois\\Athena\\CacheInterface", "fromLink": "CharlotteDunois/Athena/CacheInterface.html", "link": "CharlotteDunois/Athena/CacheInterface.html#method_set", "name": "CharlotteDunois\\Athena\\CacheInterface::set", "doc": "&quot;Sets an item in the cache. The promise gets always rejected on errors.&quot;"},
-                    {"type": "Method", "fromName": "CharlotteDunois\\Athena\\CacheInterface", "fromLink": "CharlotteDunois/Athena/CacheInterface.html", "link": "CharlotteDunois/Athena/CacheInterface.html#method_delete", "name": "CharlotteDunois\\Athena\\CacheInterface::delete", "doc": "&quot;Deletes an item in the cache. The promise gets always rejected on errors.&quot;"},
-            
-            
                                         // Fix trailing commas in the index
         {}
     ];
