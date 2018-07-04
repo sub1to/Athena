@@ -198,9 +198,9 @@ class AthenaCache extends \CharlotteDunois\Events\EventEmitter implements CacheI
                         $reject(new \Exception('Unable to set item in redis'));
                     }
                 } catch(\Throwable | \Exception | \ErrorException $e) {
-                   $reject($e);
-               }
-           });
+                    $reject($e);
+                }
+            });
         }));
     }
     
