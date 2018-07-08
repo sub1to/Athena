@@ -33,13 +33,13 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     /**
      * Constructor. Optional options are as following:
      *
-     * <pre>
+     * ```
      * array(
      *     'address' => string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
      *     'prefix' => string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
      *     'options' => array (additional options to pass to the redis client)
      * )
-     * </pre>
+     * ```
      *
      * The client has two events: error and debug. Debug contains debug information. And error gets emitted when predis emits an error.
      *
