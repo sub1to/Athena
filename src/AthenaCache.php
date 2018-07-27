@@ -90,7 +90,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
         }
         
         $vars = \get_object_vars($this);
-        unset($vars['loop'], $vars['redis']);
+        unset($vars['loop'], $vars['redis'], $vars['listeners'], $vars['onceListeners']);
         
         return \serialize($vars);
     }
