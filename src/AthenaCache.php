@@ -12,7 +12,7 @@ namespace CharlotteDunois\Athena;
 /**
  * The Athena Cache client. Uses Redis as cache asynchronously.
  */
-class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, CacheInterface, \Serializable {
+class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, CacheInterface {
     use \CharlotteDunois\Events\EventEmitterTrait;
     
     /** @var \React\EventLoop\LoopInterface */
@@ -39,8 +39,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * array(
      *     'address' => string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
      *     'prefix' => string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
-     *     'options' => array, (additional options to pass to the redis client),
-     *     'globalLoopFun' => callable, (a global function which returns an event loop, useful for serialization and de-serialization)
+     *     'options' => array, (additional options to pass to the redis client)
      * )
      * ```
      *
@@ -81,28 +80,11 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     }
     
     /**
-     * @throws \RuntimeException
-     * @internal
+     * Returns all properties important properties for serialization, and later to use for creating a new instance from the unserialized data.
+     * @return array
      */
-    function serialize() {
-        if(empty($this->options) || empty($this->options['globalLoopFun'])) {
-            throw new \RuntimeException('Can not serialize AthenaCache without "globalLoopFun" being defined');
-        }
-        
-        $vars = \get_object_vars($this);
-        unset($vars['loop'], $vars['redis'], $vars['listeners'], $vars['onceListeners']);
-        
-        return \serialize($vars);
-    }
-    
-    /**
-     * @internal
-     */
-    function unserialize($data) {
-        $vars = \unserialize($data);
-        $fun = $vars['options']['globalLoopFun'];
-        
-        $this->__construct($fun(), $vars['options']);
+    function getProperties() {
+        return array('options' => $this->options);
     }
     
     /**
