@@ -88,7 +88,7 @@
 
     <p>    class
     <strong>AthenaCache</strong>        implements
-        <a href="../../CharlotteDunois/Athena/CacheInterface.html"><abbr title="CharlotteDunois\Athena\CacheInterface">CacheInterface</abbr></a>, <abbr title="CharlotteDunois\Events\EventEmitterInterface">EventEmitterInterface</abbr>, <a href="https://secure.php.net/Serializable" target="_blank">Serializable</a>        (<a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php" target="_blank">View source</a>)
+        <a href="../../CharlotteDunois/Athena/CacheInterface.html"><abbr title="CharlotteDunois\Athena\CacheInterface">CacheInterface</abbr></a>, <abbr title="CharlotteDunois\Events\EventEmitterInterface">EventEmitterInterface</abbr>        (<a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php" target="_blank">View source</a>)
 </p>
 
         
@@ -192,6 +192,16 @@
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getProperties">getProperties</a>()
+        
+                                            <p>Returns all properties important properties for serialization, and later to use for creating a new instance from the unserialized data.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
                     <abbr title="Predis\Async\Client">Client</abbr>
                 </div>
                 <div class="col-md-8 type">
@@ -218,7 +228,7 @@
             <div id="method-details">
                     <div class="method-item">
                     <h3 id="method___construct">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L52">line 52</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L51">line 51</a></div>
         <code>                    
     <strong>__construct</strong>(<abbr title="React\EventLoop\LoopInterface">LoopInterface</abbr>|null $loop = null, array $options = array())
         </code>
@@ -231,8 +241,7 @@
                                     <p>Constructor. Optional options are as following:</p>                    <p><pre><code>array(
     'address' =&gt; string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
     'prefix' =&gt; string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
-    'options' =&gt; array, (additional options to pass to the redis client),
-    'globalLoopFun' =&gt; callable, (a global function which returns an event loop, useful for serialization and de-serialization)
+    'options' =&gt; array, (additional options to pass to the redis client)
 )
 </code></pre>
 
@@ -264,7 +273,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_delete">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L244">line 244</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L226">line 226</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>delete</strong>(string $key)
         </code>
@@ -306,7 +315,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_destroy">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L127">line 127</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L109">line 109</a></div>
         <code>                    
     <strong>destroy</strong>()
         </code>
@@ -329,7 +338,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_get">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L138">line 138</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L120">line 120</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>get</strong>(string $key, mixed $defVal = null, bool $throwOnNotFound = false)
         </code>
@@ -381,7 +390,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getAll">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L171">line 171</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L153">line 153</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>getAll</strong>(array $keys, mixed $defVal = null, bool $omitIfNotFound = false)
         </code>
@@ -433,7 +442,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getLoop">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L112">line 112</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L94">line 94</a></div>
         <code>                    <abbr title="React\EventLoop\LoopInterface">LoopInterface</abbr>
     <strong>getLoop</strong>()
         </code>
@@ -464,8 +473,40 @@
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_getProperties">
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L86">line 86</a></div>
+        <code>                    array
+    <strong>getProperties</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Returns all properties important properties for serialization, and later to use for creating a new instance from the unserialized data.</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                        
+                        
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_getRedis">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L120">line 120</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L102">line 102</a></div>
         <code>                    <abbr title="Predis\Async\Client">Client</abbr>
     <strong>getRedis</strong>()
         </code>
@@ -497,7 +538,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_set">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L209">line 209</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L191">line 191</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>set</strong>(string $key, mixed $value, int|null $lifetime = null)
         </code>
