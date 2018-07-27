@@ -40,7 +40,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      *     'address' => string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
      *     'prefix' => string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
      *     'options' => array, (additional options to pass to the redis client),
-     *     'globalLoopFun' => string', (a global function which returns an event loop, useful for serialization and de-serialization)
+     *     'globalLoopFun' => callable, (a global function which returns an event loop, useful for serialization and de-serialization)
      * )
      * ```
      *
