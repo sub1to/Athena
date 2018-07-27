@@ -12,7 +12,7 @@ namespace CharlotteDunois\Athena;
 /**
  * The Athena Cache client. Uses Redis as cache asynchronously.
  */
-class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, CacheInterface {
+class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, CacheInterface, \Serializable {
     use \CharlotteDunois\Events\EventEmitterTrait;
     
     /** @var \React\EventLoop\LoopInterface */
@@ -23,6 +23,8 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     
     /** @var string */
     protected $prefix = '';
+    
+    protected $options;
     
     /**
      * Maximum default lifetime in seconds.
@@ -37,7 +39,8 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * array(
      *     'address' => string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
      *     'prefix' => string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
-     *     'options' => array (additional options to pass to the redis client)
+     *     'options' => array, (additional options to pass to the redis client),
+     *     'globalLoopFun' => string', (a global function which returns an event loop, useful for serialization and de-serialization)
      * )
      * ```
      *
@@ -54,6 +57,8 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
         if(isset($options['prefix'])) {
             $this->prefix = (string) $options['prefix'];
         }
+        
+        $this->options = $options;
         
         $options = array('eventloop' => $loop, 'exceptions' => false, 'on_error' => function ($client, $error) {
             if($error === 'on_error') {
@@ -73,6 +78,31 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
         $this->redis->connect(function () {
             $this->emit('debug', 'Connected to Redis');
         });
+    }
+    
+    /**
+     * @throws \RuntimeException
+     * @internal
+     */
+    function serialize() {
+        if(empty($this->options) || empty($this->options['globalLoopFun'])) {
+            throw new \RuntimeException('Can not serialize AthenaCache without "globalLoopFun" being defined');
+        }
+        
+        $vars = \get_object_vars($this);
+        unset($vars['loop'], $vars['redis']);
+        
+        return \serialize($vars);
+    }
+    
+    /**
+     * @internal
+     */
+    function unserialize($data) {
+        $vars = \unserialize($data);
+        $fun = $vars['options']['globalLoopFun'];
+        
+        $this->__construct($fun(), $vars['options']);
     }
     
     /**
