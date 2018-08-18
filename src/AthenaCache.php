@@ -105,6 +105,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     
     /**
      * Disconnects from redis.
+     * @return void
      */
     function destroy() {
         $this->redis->disconnect();
