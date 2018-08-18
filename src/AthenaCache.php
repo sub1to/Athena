@@ -80,11 +80,11 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     }
     
     /**
-     * Returns all properties important properties for serialization, and later to use for creating a new instance from the unserialized data.
+     * Returns the options.
      * @return array
      */
-    function getProperties() {
-        return array('options' => $this->options);
+    function getOptions() {
+        return $this->options;
     }
     
     /**
