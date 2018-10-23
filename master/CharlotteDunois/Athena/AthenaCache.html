@@ -142,6 +142,16 @@
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
+                    <abbr title="React\Promise\PromiseInterface">PromiseInterface</abbr>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_connect">connect</a>()
+        
+                                            <p>Starts connecting to redis.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
                     <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
                 </div>
                 <div class="col-md-8 type">
@@ -202,7 +212,7 @@
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    <abbr title="Predis\Async\Client">Client</abbr>
+                    <abbr title="Clue\React\Redis\Client">Client</abbr>
                 </div>
                 <div class="col-md-8 type">
                     <a href="#method_getRedis">getRedis</a>()
@@ -240,12 +250,12 @@
                     <div class="method-description">
                                     <p>Constructor. Optional options are as following:</p>                    <p><pre><code>array(
     'address' =&gt; string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
+    'connector' =&gt; \React\Socket\ConnectorInterface, (a connector used to connect to the redis server)
     'prefix' =&gt; string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
-    'options' =&gt; array, (additional options to pass to the redis client)
 )
 </code></pre>
 
-<p>The client has two events: error and debug. Debug contains debug information. And error gets emitted when predis emits an error.</p>                            </div>
+<p>The client has two events: error and debug. Debug contains debug information. And error gets emitted when redis emits an error.</p>                            </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
@@ -272,8 +282,40 @@
 
             </div>
                     <div class="method-item">
+                    <h3 id="method_connect">
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L72">line 72</a></div>
+        <code>                    <abbr title="React\Promise\PromiseInterface">PromiseInterface</abbr>
+    <strong>connect</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Starts connecting to redis.</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><abbr title="React\Promise\PromiseInterface">PromiseInterface</abbr></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                        
+                        
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
                     <h3 id="method_delete">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L227">line 227</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L202">line 202</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>delete</strong>(string $key)
         </code>
@@ -315,7 +357,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_destroy">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L110">line 110</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L117">line 117</a></div>
         <code>                    void
     <strong>destroy</strong>()
         </code>
@@ -347,7 +389,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_get">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L121">line 121</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L128">line 128</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>get</strong>(string $key, mixed $defVal = null, bool $throwOnNotFound = false)
         </code>
@@ -399,7 +441,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getAll">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L154">line 154</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L151">line 151</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>getAll</strong>(array $keys, mixed $defVal = null, bool $omitIfNotFound = false)
         </code>
@@ -451,7 +493,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getLoop">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L94">line 94</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L101">line 101</a></div>
         <code>                    <abbr title="React\EventLoop\LoopInterface">LoopInterface</abbr>
     <strong>getLoop</strong>()
         </code>
@@ -483,7 +525,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getOptions">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L86">line 86</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L93">line 93</a></div>
         <code>                    array
     <strong>getOptions</strong>()
         </code>
@@ -515,8 +557,8 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getRedis">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L102">line 102</a></div>
-        <code>                    <abbr title="Predis\Async\Client">Client</abbr>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L109">line 109</a></div>
+        <code>                    <abbr title="Clue\React\Redis\Client">Client</abbr>
     <strong>getRedis</strong>()
         </code>
     </h3>
@@ -532,7 +574,7 @@
 
                     <table class="table table-condensed">
         <tr>
-            <td><abbr title="Predis\Async\Client">Client</abbr></td>
+            <td><abbr title="Clue\React\Redis\Client">Client</abbr></td>
             <td></td>
         </tr>
     </table>
@@ -547,7 +589,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_set">
-        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L192">line 192</a></div>
+        <div class="location">at         <a href="https://github.com/CharlotteDunois/Athena/blob/master/src/AthenaCache.php#L189">line 189</a></div>
         <code>                    <abbr title="React\Promise\ExtendedPromiseInterface">ExtendedPromiseInterface</abbr>
     <strong>set</strong>(string $key, mixed $value, int|null $lifetime = null)
         </code>
