@@ -1,6 +1,6 @@
 # Athena [![Build Status](https://scrutinizer-ci.com/g/CharlotteDunois/Athena/badges/build.png?b=master)](https://scrutinizer-ci.com/g/CharlotteDunois/Athena/build-status/master)
 
-Athena is an asynchronous cache library for PHP. It defines an asynchronous cache interface using Promises, which can also be used by others to implement alternatives. `AthenaCache` utilizes Redis with the help of `predis-async`.
+Athena is an asynchronous cache library for PHP. It defines an asynchronous cache interface using Promises, which can also be used by others to implement alternatives. `AthenaCache` utilizes Redis with the help of `clue/redis-react`, as `predis-async` is unmaintained.
 
 # Getting Started
 Getting started with Athena is pretty straight forward. All you need to do is to use [composer](https://packagist.org/packages/charlottedunois/athena) to install Athena and its dependencies.

@@ -18,7 +18,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     /** @var \React\EventLoop\LoopInterface */
     protected $loop;
     
-    /** @var \Predis\Async\Client */
+    /** @var \Clue\React\Redis\Client */
     protected $redis;
     
     /** @var string */
@@ -38,12 +38,12 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * ```
      * array(
      *     'address' => string, (the address to connect to (an URI string), defaults to tcp://127.0.0.1:6379)
+     *     'connector' => \React\Socket\ConnectorInterface, (a connector used to connect to the redis server)
      *     'prefix' => string, (the prefix to prepend to keys to create an user-land namespace, useful for multiple "databases" inside a logical database)
-     *     'options' => array, (additional options to pass to the redis client)
      * )
      * ```
      *
-     * The client has two events: error and debug. Debug contains debug information. And error gets emitted when predis emits an error.
+     * The client has two events: error and debug. Debug contains debug information. And error gets emitted when redis emits an error.
      *
      * @param \React\EventLoop\LoopInterface|null  $loop
      * @param array                                $options
@@ -57,24 +57,31 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
             $this->prefix = (string) $options['prefix'];
         }
         
+        $this->loop = $loop;
         $this->options = $options;
-        
-        $options = array('eventloop' => $loop, 'exceptions' => false, 'on_error' => function ($client, $error) {
-            if($error === 'on_error') {
-                return;
-            }
-            
-            $this->emit('error', $error);
-        });
         
         if(!empty($options['options']) && \is_array($options['options'])) {
             $options = \array_merge($options['options'], $options);
         }
-        
-        $this->loop = $loop;
-        $this->redis = new \Predis\Async\Client((!empty($options['address']) ? $options['address'] : 'tcp://127.0.0.1:6379'), $options);
-        
-        $this->redis->connect(function () {
+    }
+    
+    /**
+     * Starts connecting to redis.
+     * @return \React\Promise\PromiseInterface
+     */
+    function connect() {
+        $factory = new \Clue\React\Redis\Factory($this->loop, ($this->options['connector'] ?? null));
+        return $factory->createClient((!empty($this->options['address']) ? $this->options['address'] : 'tcp://127.0.0.1:6379'))->then(function (\Clue\React\Redis\Client $client) {
+            $this->redis = $client;
+            
+            $this->redis->on('error', function ($error) {
+                $this->emit('error', $error);
+            });
+            
+            $this->redis->on('close', function () {
+                $this->emit('close');
+            });
+            
             $this->emit('debug', 'Connected to Redis');
         });
     }
@@ -97,7 +104,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     
     /**
      * Returns the redis client.
-     * @return \Predis\Async\Client
+     * @return \Clue\React\Redis\Client
      */
     function getRedis() {
         return $this->redis;
@@ -108,7 +115,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @return void
      */
     function destroy() {
-        $this->redis->disconnect();
+        $this->redis->close();
     }
     
     /**
@@ -116,32 +123,22 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @param string  $key
      * @param mixed   $defVal
      * @param bool    $throwOnNotFound  Rejects the promise if the item is not found.
-     * @return \React\Promise\ExtendedPromiseInterface
+     * @return \React\Promise\PromiseInterface
      */
     function get(string $key, $defVal = null, bool $throwOnNotFound = false): \React\Promise\ExtendedPromiseInterface {
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($key, $defVal, $throwOnNotFound) {
-            $key = $this->normalizeKey($key);
-            
-            $this->redis->get($this->prefix.$key, function ($value) use ($key, $defVal, $throwOnNotFound, $resolve, $reject) {
-                try {
-                    if($value instanceof \Predis\Response\ErrorInterface) {
-                        return $reject($value);
-                    }
-                    
-                    if($value === null) {
-                        if($throwOnNotFound) {
-                            return $reject(new \RuntimeException('Item "'.$key.'" not found'));
-                        }
-                        
-                        return $resolve($defVal);
-                    }
-                    
-                    $resolve(\unserialize($value));
-                } catch(\Throwable | \Exception | \ErrorException $e) {
-                    $reject($e);
+        $key = $this->normalizeKey($key);
+        
+        return $this->redis->get($this->prefix.$key)->then(function ($value) use ($key, $defVal, $throwOnNotFound) {
+            if($value === null) {
+                if($throwOnNotFound) {
+                    throw new \UnderflowException('Item "'.$key.'" not found');
                 }
-            });
-        }));
+                
+                return $defVal;
+            }
+            
+            return \unserialize($value);
+        });
     }
     
     /**
@@ -187,59 +184,25 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @param string    $key
      * @param mixed     $value     Must be serializable.
      * @param int|null  $lifetime  Maximum lifetime in seconds.
-     * @return \React\Promise\ExtendedPromiseInterface
+     * @return \React\Promise\PromiseInterface
      */
     function set(string $key, $value, ?int $lifetime = null): \React\Promise\ExtendedPromiseInterface {
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($key, $value, $lifetime) {
-            $key = $this->normalizeKey($key);
-            
-            $this->redis->set($this->prefix.$key, \serialize($value), function ($status) use ($key, $lifetime, $resolve, $reject) {
-                try {
-                    if($status instanceof \Predis\Response\ErrorInterface) {
-                        return $reject($status);
-                    }
-                    
-                    if($status->getPayload() === 'OK' || $status->getPayload() === 'QUEUED') {
-                        $this->redis->expire($this->prefix.$key, ($lifetime ?: $this->lifetime), function ($status) use ($key, $resolve, $reject) {
-                            if($status === 1) {
-                                $resolve();
-                            } else {
-                                $this->delete($key)->always(function () use ($reject) {
-                                    $reject(new \Exception('Unable to set expire on item in redis'));
-                                });
-                            }
-                        });
-                    } else {
-                        $reject(new \Exception('Unable to set item in redis'));
-                    }
-                } catch(\Throwable | \Exception | \ErrorException $e) {
-                    $reject($e);
-                }
-            });
-        }));
+        $key = $this->normalizeKey($key);
+        
+        return $this->redis->set($this->prefix.$key, \serialize($value))->then(function () use ($key, $lifetime) {
+            return $this->redis->expire($this->prefix.$key, ($lifetime ?: $this->lifetime));
+        });
     }
     
     /**
      * Deletes an item in the cache. The promise gets always rejected on errors.
      * @param string  $key
-     * @return \React\Promise\ExtendedPromiseInterface
+     * @return \React\Promise\PromiseInterface
      */
     function delete(string $key): \React\Promise\ExtendedPromiseInterface {
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($key) {
-            $key = $this->normalizeKey($key);
-            
-            $this->redis->del($this->prefix.$key, function ($status) use ($resolve, $reject) {
-                try {
-                    if($status instanceof \Predis\Response\ErrorInterface) {
-                        return $reject($status);
-                    }
-                    
-                    $resolve();
-                } catch(\Throwable | \Exception | \ErrorException $e) {
-                    $reject($e);
-                }
-            });
-        }));
+        $key = $this->normalizeKey($key);
+        
+        return $this->redis->del($this->prefix.$key);
     }
     
     /**
@@ -247,24 +210,5 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      */
     protected function normalizeKey($key): string {
         return \preg_replace('/[^A-Z0-9\-_][\s]/iu', '-', $key);
-    }
-    
-    /**
-     * @return \React\Promise\ExtendedPromiseInterface
-     */
-    protected function getMap(): \React\Promise\ExtendedPromiseInterface {
-        return (new \React\Promise\Promise(function (callable $resolve, callable $reject) {
-            $this->redis->get($this->prefix.'cachemap', function ($map) use ($resolve, $reject) {
-                try {
-                    if($map instanceof \Predis\Response\ErrorInterface) {
-                        return $reject($map);
-                    }
-                    
-                    $resolve(($map !== null ? \json_decode($map, true) : array()));
-                } catch(\Throwable | \Exception | \ErrorException $e) {
-                    $reject($e);
-                }
-            });
-        }));
     }
 }
