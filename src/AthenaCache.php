@@ -24,7 +24,11 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     /** @var string */
     protected $prefix = '';
     
+    /** @var array */
     protected $options;
+    
+    /** @var \React\Promise\PromiseInterface|null */
+    protected $connectPromise;
     
     /**
      * Maximum default lifetime in seconds.
@@ -70,20 +74,28 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @return \React\Promise\PromiseInterface
      */
     function connect() {
-        $factory = new \Clue\React\Redis\Factory($this->loop, ($this->options['connector'] ?? null));
-        return $factory->createClient((!empty($this->options['address']) ? $this->options['address'] : 'redis://127.0.0.1:6379'))->then(function (\Clue\React\Redis\Client $client) {
-            $this->redis = $client;
-            
-            $this->redis->on('error', function ($error) {
-                $this->emit('error', $error);
+        if($this->redis) {
+            return \React\Promise\resolve();
+        }
+        
+        if(!$this->connectPromise) {
+            $factory = new \Clue\React\Redis\Factory($this->loop, ($this->options['connector'] ?? null));
+            $this->connectPromise = $factory->createClient((!empty($this->options['address']) ? $this->options['address'] : 'redis://127.0.0.1:6379'))->then(function (\Clue\React\Redis\Client $client) {
+                $this->redis = $client;
+                
+                $this->redis->on('error', function ($error) {
+                    $this->emit('error', $error);
+                });
+                
+                $this->redis->on('close', function () {
+                    $this->emit('close');
+                });
+                
+                $this->emit('debug', 'Connected to Redis');
             });
-            
-            $this->redis->on('close', function () {
-                $this->emit('close');
-            });
-            
-            $this->emit('debug', 'Connected to Redis');
-        });
+        }
+        
+        return $this->connectPromise;
     }
     
     /**
@@ -125,7 +137,13 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @param bool    $throwOnNotFound  Rejects the promise if the item is not found.
      * @return \React\Promise\PromiseInterface
      */
-    function get(string $key, $defVal = null, bool $throwOnNotFound = false): \React\Promise\ExtendedPromiseInterface {
+    function get(string $key, $defVal = null, bool $throwOnNotFound = false): \React\Promise\PromiseInterface {
+        if(!$this->redis) {
+            return $this->connect()->then(function () use ($key, $defVal, $throwOnNotFound) {
+                return $this->get($key, $defVal, $throwOnNotFound);
+            });
+        }
+        
         $key = $this->normalizeKey($key);
         
         return $this->redis->get($this->prefix.$key)->then(function ($value) use ($key, $defVal, $throwOnNotFound) {
@@ -146,9 +164,15 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @param string[]  $keys
      * @param mixed     $defVal
      * @param bool      $omitIfNotFound
-     * @return \React\Promise\ExtendedPromiseInterface
+     * @return \React\Promise\PromiseInterface
      */
-    function getAll(array $keys, $defVal = null, bool $omitIfNotFound = false): \React\Promise\ExtendedPromiseInterface {
+    function getAll(array $keys, $defVal = null, bool $omitIfNotFound = false): \React\Promise\PromiseInterface {
+        if(!$this->redis) {
+            return $this->connect()->then(function () use ($key, $defVal, $omitIfNotFound) {
+                return $this->getAll($key, $defVal, $omitIfNotFound);
+            });
+        }
+        
         return (new \React\Promise\Promise(function (callable $resolve, callable $reject) use ($keys, $defVal, $omitIfNotFound) {
             $values = array();
             
@@ -186,7 +210,13 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @param int|null  $lifetime  Maximum lifetime in seconds.
      * @return \React\Promise\PromiseInterface
      */
-    function set(string $key, $value, ?int $lifetime = null): \React\Promise\ExtendedPromiseInterface {
+    function set(string $key, $value, ?int $lifetime = null): \React\Promise\PromiseInterface {
+        if(!$this->redis) {
+            return $this->connect()->then(function () use ($key, $value, $lifetime) {
+                return $this->set($key, $value, $lifetime);
+            });
+        }
+        
         $key = $this->normalizeKey($key);
         
         return $this->redis->set($this->prefix.$key, \serialize($value))->then(function () use ($key, $lifetime) {
@@ -199,7 +229,13 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @param string  $key
      * @return \React\Promise\PromiseInterface
      */
-    function delete(string $key): \React\Promise\ExtendedPromiseInterface {
+    function delete(string $key): \React\Promise\PromiseInterface {
+        if(!$this->redis) {
+            return $this->connect()->then(function () use ($key) {
+                return $this->delete($key);
+            });
+        }
+        
         $key = $this->normalizeKey($key);
         
         return $this->redis->del($this->prefix.$key);
