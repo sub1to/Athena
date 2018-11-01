@@ -168,8 +168,8 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      */
     function getAll(array $keys, $defVal = null, bool $omitIfNotFound = false): \React\Promise\PromiseInterface {
         if(!$this->redis) {
-            return $this->connect()->then(function () use ($key, $defVal, $omitIfNotFound) {
-                return $this->getAll($key, $defVal, $omitIfNotFound);
+            return $this->connect()->then(function () use ($keys, $defVal, $omitIfNotFound) {
+                return $this->getAll($keys, $defVal, $omitIfNotFound);
             });
         }
         
