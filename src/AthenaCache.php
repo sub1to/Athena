@@ -88,6 +88,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
                 });
                 
                 $this->redis->on('close', function () {
+                    $this->redis = null;
                     $this->emit('close');
                 });
                 
@@ -127,7 +128,9 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @return void
      */
     function destroy() {
-        $this->redis->close();
+        if($this->redis) {
+            $this->redis->close();
+        }
     }
     
     /**
