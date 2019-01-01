@@ -82,6 +82,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
             $factory = new \Clue\React\Redis\Factory($this->loop, ($this->options['connector'] ?? null));
             $this->connectPromise = $factory->createClient((!empty($this->options['address']) ? $this->options['address'] : 'redis://127.0.0.1:6379'))->then(function (\Clue\React\Redis\Client $client) {
                 $this->redis = $client;
+                $this->connectPromise = null;
                 
                 $this->redis->on('error', function ($error) {
                     $this->emit('error', $error);
