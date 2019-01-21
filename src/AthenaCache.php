@@ -30,6 +30,9 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
     /** @var \React\Promise\PromiseInterface|null */
     protected $connectPromise;
     
+    /** @var bool */
+    protected $destroyed = false;
+    
     /**
      * Maximum default lifetime in seconds.
      * @var int
@@ -97,6 +100,7 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
             });
         }
         
+        $this->destroyed = false;
         return $this->connectPromise;
     }
     
@@ -129,6 +133,8 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      * @return void
      */
     function destroy() {
+        $this->destroyed = true;
+        
         if($this->redis) {
             $this->redis->close();
         }
@@ -143,6 +149,10 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      */
     function get(string $key, $defVal = null, bool $throwOnNotFound = false): \React\Promise\PromiseInterface {
         if(!$this->redis) {
+            if($this->destroyed) {
+                return \React\Promise\reject((new \RuntimeException('Client got destroyed')));
+            }
+            
             return $this->connect()->then(function () use ($key, $defVal, $throwOnNotFound) {
                 return $this->get($key, $defVal, $throwOnNotFound);
             });
@@ -172,6 +182,10 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      */
     function getAll(array $keys, $defVal = null, bool $omitIfNotFound = false): \React\Promise\PromiseInterface {
         if(!$this->redis) {
+            if($this->destroyed) {
+                return \React\Promise\reject((new \RuntimeException('Client got destroyed')));
+            }
+            
             return $this->connect()->then(function () use ($keys, $defVal, $omitIfNotFound) {
                 return $this->getAll($keys, $defVal, $omitIfNotFound);
             });
@@ -216,6 +230,10 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      */
     function set(string $key, $value, ?int $lifetime = null): \React\Promise\PromiseInterface {
         if(!$this->redis) {
+            if($this->destroyed) {
+                return \React\Promise\reject((new \RuntimeException('Client got destroyed')));
+            }
+            
             return $this->connect()->then(function () use ($key, $value, $lifetime) {
                 return $this->set($key, $value, $lifetime);
             });
@@ -235,6 +253,10 @@ class AthenaCache implements \CharlotteDunois\Events\EventEmitterInterface, Cach
      */
     function delete(string $key): \React\Promise\PromiseInterface {
         if(!$this->redis) {
+            if($this->destroyed) {
+                return \React\Promise\reject((new \RuntimeException('Client got destroyed')));
+            }
+            
             return $this->connect()->then(function () use ($key) {
                 return $this->delete($key);
             });
